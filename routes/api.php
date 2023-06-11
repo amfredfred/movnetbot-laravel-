@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\StatugramRequestsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +17,9 @@ use App\Http\Controllers\FrontController;
 |
 */
 
-Route::post('/webhook', FrontController::class);
+Route::post('/search', [SearchController::class, 'search']);
+Route::get('/watch', [StatugramRequestsController::class, 'watch']);
+Route::get('/webhook', FrontController::class);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

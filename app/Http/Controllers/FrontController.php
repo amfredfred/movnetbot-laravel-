@@ -14,8 +14,7 @@ class FrontController extends Controller
     * Handle the telegram webhook request.
     */
 
-    public function __invoke( Nutgram $bot )
- {
+    public function __invoke( Nutgram $bot ) {
         $bot->setRunningMode( Webhook::class );
         $bot->run();
         return [ 'Running Front'=>true ];

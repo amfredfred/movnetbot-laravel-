@@ -146,6 +146,7 @@ return [
 
     'view_wesite' => env('MAIN_APP_VIEW_URL', 'https://statugram.com/watch?v='),
     'wesite_url' => env('MAIN_APP_URL', 'https://statugram.com/'),
+    'web_app_url'=>env('TELEGRAM_WEB_APP_LAUNCH_URL'),
 
     /*
     |--------------------------------------------------------------------------
