@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Http\Resources\PostsResource;
 use App\Models\BotUsers;
+use App\Models\Posts;
 use DateTime;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
@@ -31,8 +32,14 @@ trait FilesHelper {
         }
     }
 
-    static function MakeTitle( $url, $path ) {
-        return 'Untitiled Video';
+    static function MakeTitle( $caption, $path ) {
+        $caption = Str::upper( $caption );
+        $title = null;
+        if ( strstr( $caption, 'TITLE' ) ) {
+            $extract = explode( 'TITLE', $caption??'' )[ 1 ];
+            $title = explode( "/,\s*$/m", $extract??'' )[ 0 ];
+        }
+        return $title?? 'Untitied Video';
     }
 
     static function SaveUser( Nutgram $bot ) {
@@ -59,6 +66,7 @@ trait FilesHelper {
         }
         if ( $chat?->isSupergroup() ) {
             $user[ 'user_type' ] = 'isSuperGroup';
+            $from = $message->from;
             // Log::channel( 'telegram' )->alert( '', [ 'isSupergroup' ] );
         }
 
@@ -82,6 +90,7 @@ trait FilesHelper {
         $user[ 'last_name' ] = $from->last_name;
         $user[ 'chat_id' ] = $from->id;
         $user[ 'last_checkin' ] = time();
+        $user[ 'role' ] = [ 'user' ];
         $user[ 'query_count' ] = ( $user[ 'query_count' ]?? 0 )  +1;
         if ( $oldUser ) $oldUser = $user;
         return $oldUser ?? $user;
@@ -97,5 +106,32 @@ trait FilesHelper {
 
     static function WatchUrl( $target = '' ) {
         return config( 'app.view_wesite' ).$target;
+    }
+
+    static function SaveFile( $filez ) {
+        $post_id = Str::random( 5 );
+        $linkToPost = config( 'app.wesite_url' ).explode( '/', $filez[ 'mime_type' ] )[ 0 ].'?v='.$post_id;
+        $thumbnailPath = "uploads/thumbs/$post_id".'.'.pathinfo( $filez[ 'thumbnail' ], PATHINFO_EXTENSION );
+        try {
+            self::DownloadMedia( $filez[ 'thumbnail' ], public_path( $thumbnailPath ) );
+            // $bot::DownloadMedia( $vur, public_path( 'uploads/videos/'.$post_id.'.'.pathinfo( $vur, PATHINFO_EXTENSION ) ) );
+        } catch ( \Throwable $th ) {
+            Log::channel( 'telegram' )->info( '', [ $th->getMessage() ] );
+        }
+        $saved = Posts::create( [
+            'file_id'=>$post_id,
+            'file_type'=> $filez[ 'mime_type' ],
+            'file_caption'=> $filez[ 'caption' ] ?? 'No Caption',
+            'file_size'=> self::KbTobB( $filez[ 'file_size' ] ),
+            'file_uploader'=> $filez[ 'username' ],
+            'file_views'=>0,
+            'file_downloads'=>0,
+            'file_parent_path'=> $filez[ 'parent_path' ],
+            'file_description'=>'',
+            'file_remote_id'=> $filez[ 'file_id' ],
+            'file_thumbnails'=>   $thumbnailPath,
+            'file_download_link'=> $linkToPost,
+        ] );
+        return [ 'link' => $linkToPost, 'post_id'=>$post_id ];
     }
 }

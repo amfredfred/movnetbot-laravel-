@@ -13,6 +13,7 @@ class DeleteFileCommand extends Command
 
     public function handle(Nutgram $bot): void
     {
+        $bot::SaveUser($bot);
         $bot->sendMessage('This is a command!');
     }
 }

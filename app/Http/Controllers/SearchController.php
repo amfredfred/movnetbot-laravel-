@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PostResponseResource;
 use App\Models\Posts;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
  {
+
+     public $qs;
+     public $posts = [];
 
     public function map( $post ) {
         return  new PostResponseResource( $post );
@@ -21,25 +26,20 @@ class SearchController extends Controller
     }
 
     public function query( $query ) {
-        $contents = [];
-        $explodQuery = array_unique( explode( ' ', $query ) );
-
-        foreach ( $explodQuery as $key => $value ) {
-            $posts = Posts::where( 'file_caption', 'LIKE', "%{$value}%" )
-            ->orWhere( 'file_caption', 'LIKE', "%$query%" )
-            ->orWhere( 'file_type', 'LIKE', "%{$value}%" )
-            ->orWhere( 'file_type', 'LIKE', "%{$query}%" )
-            ->orWhere( 'file_uploader', 'LIKE', "%{$value}%" )
-            ->orWhere( 'file_uploader', 'LIKE', "%{$query}%" )
-            ->orWhere( 'file_size', 'LIKE', "%{$value}%" )
-            ->orWhere( 'file_size', 'LIKE', "%{$query}%" )
-            ->skip( 0 )
-            ->take( 9 )
-            ->orderBy( 'updated_at', 'desc' )
-            ->get();
-            array_push( $contents, $posts->toArray() );
-        }
-        $contents = $contents[ 0 ] ;
-        return $contents;
+       try {
+         $this->qs = collect(array_unique( explode( ' ', $query ) ));
+         $this->posts  =  $query ? $this->qs->map( function($qs){
+            return Posts::where( 'file_caption', 'LIKE', "%{$qs}%" )
+            ->orWhere( 'file_type', 'LIKE', "%{$qs}%" )
+            ->orWhere( 'file_uploader', 'LIKE', "%{$qs}%" )
+            ->first();
+        })->sort()->skip( 0 )->take( 10 )->toArray() 
+        : Posts::inRandomOrder()->skip( 0 )->take( 10 )->get()->toArray();
+       } catch (\Throwable $th) {
+        Log::channel('telegram')->error("", [$th->getMessage()]);
+       }
+        return  array_unique($this->posts,SORT_REGULAR);
     }
+
+    
 }

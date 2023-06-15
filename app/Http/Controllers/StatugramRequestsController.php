@@ -15,7 +15,7 @@ class StatugramRequestsController extends Controller
         try {
             $video = Posts::where( 'file_id', $request->input( 'v' ) )->first();
             $post = new PostResponseResource( $video );
-            Log::channel( 'telegram' )->emergency( 'SERVER', [ 'message' => 'Video REquest' ] );
+            // Log::channel( 'telegram' )->emergency( 'SERVER', [ 'message' => 'Video REquest' ] );
             if ( $post ) return response()->json( $post, 200 );
             return response()->json( 'Video no found', 404 );
         } catch ( \Throwable $th ) {

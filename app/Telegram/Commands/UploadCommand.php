@@ -5,7 +5,7 @@ namespace App\Telegram\Commands;
 use SergiX44\Nutgram\Nutgram;
 use SergiX44\Nutgram\Handlers\Type\Command;
 
-class StartBotCommand extends Command
+class UploadCommand extends Command
 {
     protected string $command = 'command';
 
@@ -13,6 +13,6 @@ class StartBotCommand extends Command
 
     public function handle(Nutgram $bot): void
     {
-        $bot->sendMessage('This is a command! start');
+        $bot->sendMessage('This is a command!');
     }
 }

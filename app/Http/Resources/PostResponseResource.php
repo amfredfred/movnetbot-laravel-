@@ -17,6 +17,7 @@ class PostResponseResource extends JsonResource
  {
         parent::toArray( $request );
         $reponse = [
+            'fileUniqueId'=>$this["file_id"],
             'fileId'=>$this["id"],
             'fileType'=>$this["file_type"],
             'fileSize'=>$this["file_size"],

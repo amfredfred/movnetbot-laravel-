@@ -20,12 +20,14 @@ class BotUsers extends Model
         'watch_history',
         'saved_items',
         'user_type',
-        'query_count'
+        'query_count',
+        'role'
     ];
 
     protected $casts = [
         'search_history'=>'array',
         'watch_history'=>'array',
         'saved_items'=>'array',
+        'role'=>'array'
     ];
 }

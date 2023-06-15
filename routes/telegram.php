@@ -4,12 +4,19 @@
 use App\Http\Controllers\SearchController;
 use App\Http\Resources\PostsResource;
 use SergiX44\Nutgram\Nutgram;
-use \Illuminate\Support\Str;
-use App\Models\Posts;
 use App\Telegram\Commands\DeleteFileCommand;
 use App\Telegram\Commands\FileRequestCommand;
-use App\Telegram\Commands\StartBotCommand;
 use App\Telegram\Commands\UpdateFileCommand;
+use App\Telegram\Conversations\AdvertConversation;
+use App\Telegram\Conversations\DonateConversation;
+use App\Telegram\Conversations\LatestConversation;
+use App\Telegram\Conversations\ReportConversation;
+use App\Telegram\Conversations\RequestConversation;
+use App\Telegram\Conversations\SearchConversation;
+use App\Telegram\Conversations\StartConversation;
+use App\Telegram\Conversations\StatsConversation;
+use App\Telegram\Conversations\SuggestConversation;
+use App\Telegram\Conversations\UploadFileConversation;
 use Illuminate\Support\Facades\Log;
 use SergiX44\Nutgram\Telegram\Properties\ParseMode;
 use SergiX44\Nutgram\Telegram\Types\Keyboard\InlineKeyboardButton;
@@ -25,39 +32,6 @@ use SergiX44\Nutgram\Telegram\Types\Keyboard\InlineKeyboardMarkup;
 |
 */
 
-$bot->onVideo(function (Nutgram $bot){
-    $post_id = Str::random(5);
-    $message = $bot->message();
-    $chat = $bot->chat();
-    $video = $message->video;
-    $caption = ($message->caption ?? "No Caption");
-    $vur = $bot->getFile($video->file_id)->url();
-    $tur = $bot->getFile($video->thumbnail->file_id)->url();
-    try {
-        $bot::DownloadMedia($tur, public_path('uploads/thumbs/'.$post_id.'.'.pathinfo($tur, PATHINFO_EXTENSION)));
-        // $bot::DownloadMedia($vur, public_path('uploads/videos/'.$post_id.'.'.pathinfo($vur, PATHINFO_EXTENSION)));
-    } catch (\Throwable $th) {
-        Log::channel('telegram')->info('', [$th->getMessage()]);
-    }
-
-    $linkToPost = config('app.view_wesite').$post_id;
-    $bot::SaveUser($bot);
-        $saved = Posts::create([
-            "file_id"=>$post_id,
-            "file_type"=> $video->mime_type ,
-            "file_caption"=> $caption,
-            "file_size"=> $bot::KbTobB($video->file_size),
-            "file_uploader"=> $chat->username,
-            "file_views"=>0,
-            "file_downloads"=>0,
-            "file_parent_path"=> $vur,
-            "file_description"=>"",
-            "file_remote_id"=> $video->file_id,
-            "file_thumbnails"=>  'uploads/thumbs/'.$post_id.'.jpg',
-            "file_download_link"=> $linkToPost,
-        ]);
-    Log::channel('telegram')->info('', [$linkToPost, $message->from->username ]);
-});
 
 $bot->onInlineQuery(function(Nutgram $bot){
     $findings=[];
@@ -71,7 +45,7 @@ $bot->onInlineQuery(function(Nutgram $bot){
                     $newResult = [
                         'id'=> $bot::RandomString(4),
                         'type'=>'article',
-                        'title'=> $bot::MakeTitle('',''),
+                        'title'=> $bot::MakeTitle($post['file_caption'],''),
                         'description'=>$post['file_caption'],
                         'thumbnail_url'=> $bot::ThumbUrl($post['file_thumbnails']),
                         'input_message_content'=>[
@@ -90,7 +64,29 @@ $bot->onInlineQuery(function(Nutgram $bot){
 });
 
 
-$bot->onCommand('start', StartBotCommand::class);
+$bot->onMessage(function (Nutgram $bot){
+    $message = $bot->message();
+    $chat = $bot->chat();
+    $bot->sendMessage('Hey');
+    Log::channel('telegram')->alert('HEY', [ $message]);
+});
+
+//
+$bot->onText('/start@movnetbot',  StartConversation::class);
+$bot->onText('/search@movnetbot',  SearchConversation::class);
+
+$bot->onCommand('start', StartConversation::class);
+$bot->onCommand('search', SearchConversation::class);
+$bot->onCommand('suggest',  SuggestConversation::class);
+$bot->onCommand('latest', LatestConversation::class);
+$bot->onCommand('request', RequestConversation::class);
+$bot->onCommand('report', ReportConversation::class);
+$bot->onCommand('donate', DonateConversation::class);
+$bot->onCommand('advert', AdvertConversation::class);
+$bot->onCommand('stats', StatsConversation::class);
+
+//Admins Area
 $bot->onCommand('update', UpdateFileCommand::class);
 $bot->onCommand('delete', DeleteFileCommand::class);
 $bot->onCommand('request', FileRequestCommand::class);
+$bot->onCommand('upload', UploadFileConversation::class);

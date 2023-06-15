@@ -22,6 +22,7 @@ return new class extends Migration
             $table->json('search_history')->nullable();
             $table->json('watch_history')->nullable();
             $table->json('saved_items')->nullable();
+            $table->json('role')->nullable()->default("user");
             $table->integer('query_count')->unsigned()->nullable()->default(0);
             $table->string('user_type', 100)->nullable()->default('text');
             $table->timestamps();

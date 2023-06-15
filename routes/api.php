@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\RandomFileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StatugramRequestsController;
 
@@ -16,7 +17,7 @@ use App\Http\Controllers\StatugramRequestsController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+Route::post('/random', [RandomFileController::class, 'random']);
 Route::post('/search', [SearchController::class, 'search']);
 Route::get('/watch', [StatugramRequestsController::class, 'watch']);
 Route::get('/webhook', FrontController::class);
