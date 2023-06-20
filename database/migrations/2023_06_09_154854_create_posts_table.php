@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('file_thumbnails');
             $table->string('file_download_link');
             $table->longText('file_remote_id', 100);
+            $table->string('file_path', 100);
             $table->timestamps();
         });
     }

@@ -9,8 +9,7 @@ use SergiX44\Nutgram\Telegram\Properties\ParseMode;
 use SergiX44\Nutgram\Telegram\Types\Keyboard\InlineKeyboardButton;
 use SergiX44\Nutgram\Telegram\Types\Keyboard\InlineKeyboardMarkup;
 
-class UploadFileConversation extends Conversation
- {
+class UploadFileConversation extends Conversation {
     protected ?string $step = 'step1';
 
     public $title;
@@ -40,8 +39,8 @@ class UploadFileConversation extends Conversation
             return;
         }
         $this->type = $bot->callbackQuery()->data;
-        $bot->sendMessage( $this->steptwomessege.' '.$this->type, 
-        reply_markup: InlineKeyboardMarkup::make()->addRow( InlineKeyboardButton::make( 'Discard all', callback_data: 'discard' )));
+        $bot->sendMessage( $this->steptwomessege.' '.$this->type,
+        reply_markup: InlineKeyboardMarkup::make()->addRow( InlineKeyboardButton::make( 'Discard all', callback_data: 'discard' ) ) );
         $this->next( 'step3' );
     }
 
@@ -49,10 +48,10 @@ class UploadFileConversation extends Conversation
         $message = $bot->message();
         $msgt = $message->getType();
 
-        if($bot->isCallbackQuery()){
-            if($bot->callbackQuery()->data === 'discard'){
-                $bot->message("This session has been discarded",);
-                $this->step1($bot);
+        if ( $bot->isCallbackQuery() ) {
+            if ( $bot->callbackQuery()->data === 'discard' ) {
+                $this->discard( $bot );
+                return;
             }
         }
 
@@ -68,7 +67,7 @@ class UploadFileConversation extends Conversation
         }
 
         switch ( $msgt->value ) {
-            case 'video': 
+            case 'video':
             $this->file = [
                 'mime_type'=> $message->video->mime_type,
                 'caption'=>$this->caption,
@@ -161,7 +160,7 @@ class UploadFileConversation extends Conversation
 
     public function save( Nutgram $bot ) {
         $link = $bot::SaveFile( $this->file );
-        $bot->sendMessage( "Your ".$this->type." Has been populated!\n\nLink: ".$link[ "link" ]. "\nID: ```".$link[ "post_id" ]."```", parse_mode:ParseMode::HTML );
+        $bot->sendMessage( 'Your '.$this->type.' Has been populated!\n\nLink: '.$link[ 'link' ]. '\nID: ```'.$link[ 'post_id' ].'```', parse_mode:ParseMode::HTML );
         $this->end();
     }
 
@@ -188,7 +187,7 @@ class UploadFileConversation extends Conversation
             $this->laststep( $bot );
             return;
         }
-        $this->thumbnail = $bot->getFile( $message->photo[ count($message->photo) -1 ]->file_id )->url();
+        $this->thumbnail = $bot->getFile( $message->photo[ count( $message->photo ) -1 ]->file_id )->url();
         $this->file[ 'thumbnail' ] = $this->thumbnail;
         $this->steptext = 'Thumbnail added';
         $this->laststep( $bot );

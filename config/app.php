@@ -144,10 +144,10 @@ return [
         // 'store'  => 'redis',
     ],
 
-    'view_wesite' => env('MAIN_APP_VIEW_URL', 'https://statugram.com/watch?v='),
-    'wesite_url' => env('MAIN_APP_URL', 'https://statugram.com/'),
-    'web_app_url'=>env('TELEGRAM_WEB_APP_LAUNCH_URL'),
-
+    'watch_url' => env('WATCH_URL', 'https://statugram.com/watch?v='),
+    'webapp_url' => env('WEBAPP_URL', 'https://statugram.com/'),
+    'bot_url' => env("BOT_URL", 'https://t.me/movnetbot'),
+    
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

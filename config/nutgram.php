@@ -8,7 +8,10 @@ return [
     'safe_mode' => env( 'APP_ENV', 'local' ) === 'production',
 
     // Extra or specific configurations
-    'config' => [],
+    'config' => [
+        // set channel where all movies request should be sent
+        'reqs_chatid' => env( 'TELEGRAM_REQUESTS_CHANNEL', 'null' ),
+    ],
 
     // Set if the service provider should automatically load
     // handlers from /routes/telegram.php
@@ -22,4 +25,5 @@ return [
 
     // Set log channel
     'log_channel' => env( 'TELEGRAM_LOG_CHANNEL', 'null' ),
+
 ];

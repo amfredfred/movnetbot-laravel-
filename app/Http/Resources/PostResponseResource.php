@@ -19,6 +19,7 @@ class PostResponseResource extends JsonResource
         $reponse = [
             'fileUniqueId'=>$this["file_id"],
             'fileId'=>$this["id"],
+            'filePath'=>$this['file_path'],
             'fileType'=>$this["file_type"],
             'fileSize'=>$this["file_size"],
             'fileUploader'=>$this["file_uploader"],

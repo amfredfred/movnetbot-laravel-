@@ -21,7 +21,8 @@ class Posts extends Model
         'file_description',
         'file_thumbnails',
         'file_download_link',
-        'file_remote_id'
+        'file_remote_id',
+        'file_path'
     ];
 
 }

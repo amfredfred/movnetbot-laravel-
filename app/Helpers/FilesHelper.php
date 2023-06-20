@@ -32,14 +32,19 @@ trait FilesHelper {
         }
     }
 
-    static function MakeTitle( $caption, $path ) {
+    static function MakeTitle( $caption, $path = null ) {
         $caption = Str::upper( $caption );
         $title = null;
         if ( strstr( $caption, 'TITLE' ) ) {
             $extract = explode( 'TITLE', $caption??'' )[ 1 ];
             $title = explode( "/,\s*$/m", $extract??'' )[ 0 ];
         }
-        return $title?? 'Untitied Video';
+        return $title?? $caption ;
+    }
+
+    static function MakeSlug( $caption ) {
+        $caption = self::MakeTitle( Str::slug( $caption ) );
+        return   $caption ;
     }
 
     static function SaveUser( Nutgram $bot ) {
@@ -97,7 +102,7 @@ trait FilesHelper {
     }
 
     static function  WebAppUrl( $target = '' ) {
-        return config( 'app.web_app_url' ).$target;
+        return "https://statugram.com/".$target;
     }
 
     static function ThumbUrl( $target = '' ) {
@@ -105,18 +110,25 @@ trait FilesHelper {
     }
 
     static function WatchUrl( $target = '' ) {
-        return config( 'app.view_wesite' ).$target;
+        return "https://statugram.com/video?v=".$target;
+    }
+
+    static function BotLauncher() {
+        return config( 'app.bot_url' ) ?? 'https://t.me/movnetbot';
     }
 
     static function SaveFile( $filez ) {
         $post_id = Str::random( 5 );
-        $linkToPost = config( 'app.wesite_url' ).explode( '/', $filez[ 'mime_type' ] )[ 0 ].'?v='.$post_id;
-        $thumbnailPath = "uploads/thumbs/$post_id".'.'.pathinfo( $filez[ 'thumbnail' ], PATHINFO_EXTENSION );
+        $linkToPost = config( 'app.webapp_url' ).explode( '/', $filez[ 'mime_type' ] )[ 0 ].'?v='.$post_id;
+        $thumbnailPath = "uploads/thumbnails/$post_id".'.'.pathinfo( $filez[ 'thumbnail' ], PATHINFO_EXTENSION );
+        $filePath = "uploads/files/$post_id".'.'.pathinfo( $filez[ 'parent_path' ], PATHINFO_EXTENSION );
         try {
             self::DownloadMedia( $filez[ 'thumbnail' ], public_path( $thumbnailPath ) );
-            // $bot::DownloadMedia( $vur, public_path( 'uploads/videos/'.$post_id.'.'.pathinfo( $vur, PATHINFO_EXTENSION ) ) );
+            self::DownloadMedia( $filez[ 'parent_path' ], public_path( $filePath ) );
+            Log::channel( 'telegram' )->info( '', [ 'DOWNLOAD SUCCESS' ] );
         } catch ( \Throwable $th ) {
             Log::channel( 'telegram' )->info( '', [ $th->getMessage() ] );
+            return;
         }
         $saved = Posts::create( [
             'file_id'=>$post_id,
@@ -131,6 +143,7 @@ trait FilesHelper {
             'file_remote_id'=> $filez[ 'file_id' ],
             'file_thumbnails'=>   $thumbnailPath,
             'file_download_link'=> $linkToPost,
+            'file_path'=>$filePath
         ] );
         return [ 'link' => $linkToPost, 'post_id'=>$post_id ];
     }
