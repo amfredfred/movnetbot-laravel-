@@ -8,10 +8,10 @@ use SergiX44\Nutgram\RunningMode\Webhook;
 
 class TelegramController extends Controller
  {
-    public function handle( Nutgram $bot ) {
+    public function srm( Nutgram $bot ) {
         $bot = new Nutgram( config( 'nutgram.token' ) );
-        $hooked = $bot->setRunningMode( Webhook::class );
+        $bot->setRunningMode( Webhook::class );
         $bot->run();
-        return [ 'Running Front'=>[ $hooked ] ];
+        return [ 'Running Mode Is '=> 'WebHook!!' ];
     }
 }
