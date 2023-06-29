@@ -37,13 +37,12 @@ class SearchController extends Controller
             $qs =  array_unique( explode( ' ', $query ) ) ;
             foreach ( $qs as $key => $string ) {
                 $this->queryString = $string;
-                $posts = Posts::
-                 where(function (Builder $query) {
+                $posts = Posts::where(function (Builder $query) {
                     $query
                      /*@devfred*/->where( 'file_caption', 'LIKE', "%{$this->queryString}%" )
                      /*@devfred*/->orWhere( 'file_type', 'LIKE', "%{$this->queryString}%" )
                      /*@devfred*/->orWhere( 'file_uploader', 'LIKE', "%{$this->queryString}%" );
-                })->take( 10 )->get();
+                })->orderBy('updated_at', "desc")->take( 10 )->get();
                 $results->push($posts);
             }
         } catch ( \Throwable $th ) {

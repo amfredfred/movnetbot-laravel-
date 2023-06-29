@@ -2,11 +2,8 @@
 /** @var SergiX44\Nutgram\Nutgram $bot */
 
 use App\Http\Controllers\InlineQueryController;
-use App\Http\Controllers\SearchController;
-use App\Http\Resources\PostsResource;
 use SergiX44\Nutgram\Nutgram;
 use App\Telegram\Commands\DeleteFileCommand;
-use App\Telegram\Commands\FileRequestCommand;
 use App\Telegram\Commands\UpdateFileCommand;
 use App\Telegram\Conversations\AdvertConversation;
 use App\Telegram\Conversations\DonateConversation;
@@ -51,7 +48,6 @@ $bot->onCommand( 'random',  SuggestConversation::class );
 $bot->onCommand( 'latest', LatestConversation::class );
 $bot->onCommand( 'request', RequestConversation::class );
 $bot->onCommand( 'stats', StatsConversation::class );
-// $bot->onCommand( 'request', FileRequestCommand::class );
 // $bot->onCommand( 'report', ReportConversation::class );
 // $bot->onCommand( 'donate', DonateConversation::class );
 // $bot->onCommand( 'advert', AdvertConversation::class );

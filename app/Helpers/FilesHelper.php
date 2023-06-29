@@ -119,7 +119,7 @@ trait FilesHelper {
 
     static function SaveFile( $filez ) {
         $post_id = Str::random( 5 );
-        $linkToPost = config( 'app.webapp_url' ).explode( '/', $filez[ 'mime_type' ] )[ 0 ].'?v='.$post_id;
+        $linkToPost = explode( '/', $filez[ 'mime_type' ] )[ 0 ].'?v='.$post_id;
         $thumbnailPath = "uploads/thumbnails/$post_id".'.'.pathinfo( $filez[ 'thumbnail' ], PATHINFO_EXTENSION );
         $filePath = "uploads/files/$post_id".'.'.pathinfo( $filez[ 'parent_path' ], PATHINFO_EXTENSION );
         try {
